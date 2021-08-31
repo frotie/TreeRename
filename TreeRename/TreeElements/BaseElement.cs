@@ -52,13 +52,5 @@ namespace TreeRename.TreeElements
 
             return true;
         }
-
-        private IElement GetTreeRoot(IElement current)
-        {
-            if (current.BaseElement != null) 
-                return GetTreeRoot(current.BaseElement);
-            else 
-                return current;
-        }
     }
 }
