@@ -58,7 +58,7 @@ namespace TreeRename
             bool status = kitchen2.Rename("Кухня");
 
 
-            Console.WriteLine("Rename error");
+            Console.WriteLine("Rename error check");
             Console.WriteLine($"Rename status: {status}\n\n");
             PrintTree(aps);
             Console.WriteLine("=========\n\n");

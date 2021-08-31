@@ -19,12 +19,12 @@ namespace TreeRename.TreeElements
             Name = BaseName;
         }
 
+        // TODO: Check for an existing name?
         public bool AddChild(IElement child)
         {
             if (child == null) return false;
 
             child.BaseElement = this;
-
             child.ElementNumber = GetCurrentNumber(child);
             child.Name = child.BaseName + " " + child.ElementNumber.ToString();
 
@@ -46,7 +46,7 @@ namespace TreeRename.TreeElements
             if(string.IsNullOrEmpty(newName)) 
                 return false;
 
-            var list = GetSameElements(this);
+            var list = GetSameElementsFromTree(this);
             if (list.Any(e => e.Name == newName))
                 return false;
 
@@ -59,7 +59,7 @@ namespace TreeRename.TreeElements
         // Iterator pattern?
         private int GetCurrentNumber(IElement element)
         {
-            var elements = GetSameElements(element);
+            var elements = GetSameElementsFromTree(element);
             for (int i = 0; i < elements.Count; ++i)
             {
                 if(!elements.Any(e => e.ElementNumber == i + 1))
@@ -71,25 +71,26 @@ namespace TreeRename.TreeElements
             return elements.Count + 1;
         }
 
-        private List<IElement> GetSameElements(IElement element, IElement root = null)
+        private List<IElement> GetSameElementsFromTree(IElement element, IElement root = null)
         {
+            if (root == null) root = GetTreeRoot(element);
             List<IElement> currentElements = new List<IElement>();
-            if (root == null) root = GetTreeBase(element);
+
             foreach (var child in root.Children)
             {
                 if (Type.Equals(child.GetType(), element.GetType()))
                 {
                     currentElements.Add(child);
                 }
-                currentElements.AddRange(GetSameElements(element, child));
+                currentElements.AddRange(GetSameElementsFromTree(element, child));
             }
             return currentElements;
         }
 
-        private IElement GetTreeBase(IElement current)
+        private IElement GetTreeRoot(IElement current)
         {
             if (current.BaseElement != null) 
-                return GetTreeBase(current.BaseElement);
+                return GetTreeRoot(current.BaseElement);
             else 
                 return current;
         }
