@@ -36,6 +36,8 @@ namespace TreeRename
 
             // Renaming + appending
             kitchen.Rename("Кухня");
+            livingRoom.Children.First().Rename("Стена из вагонки");
+            livingRoom.AddChild(new WallElement());
             aps.AddChild(bedroom);
 
             Console.WriteLine("Renaming + appending\n\n");
@@ -44,10 +46,22 @@ namespace TreeRename
 
 
             // Removing
-            aps.RemoveChild(livingRoom);
+            aps.RemoveChild(bedroom);
 
             Console.WriteLine("Removing\n\n");
             PrintTree(aps);
+            Console.WriteLine("=========\n\n");
+
+            // Rename error
+            var kitchen2 = new Room();
+            aps.AddChild(kitchen2);
+            bool status = kitchen2.Rename("Кухня");
+
+
+            Console.WriteLine("Rename error");
+            Console.WriteLine($"Rename status: {status}\n\n");
+            PrintTree(aps);
+            Console.WriteLine("=========\n\n");
             Console.ReadKey();
         }
 

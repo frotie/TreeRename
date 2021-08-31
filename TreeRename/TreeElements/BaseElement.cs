@@ -43,7 +43,12 @@ namespace TreeRename.TreeElements
 
         public bool Rename(string newName)
         {
-            if(string.IsNullOrEmpty(newName)) return false;
+            if(string.IsNullOrEmpty(newName)) 
+                return false;
+
+            var list = GetSameElements(this);
+            if (list.Any(e => e.Name == newName))
+                return false;
 
             Name = newName;
             ElementNumber = 0;
