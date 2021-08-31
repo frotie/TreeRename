@@ -41,7 +41,7 @@ namespace TreeRename.TreeElements
             if (name == null) name = element.BaseName;
             for (int i = 0; i < _typesCollection[element.BaseName].Count; ++i)
             {
-                if (_typesCollection[element.BaseName][i].Name == name + " " + (i + 1).ToString())
+                if (_typesCollection[element.BaseName].Any(e => e.Name == name + " " + (i + 1).ToString()))
                 {
                     continue;
                 }

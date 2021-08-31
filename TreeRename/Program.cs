@@ -13,55 +13,36 @@ namespace TreeRename
         {
             Apartments aps = new Apartments();
 
-            Room kitchen = new Room();
-            Room livingRoom = new Room();
-            Room bedroom = new Room();
+            Room room1 = new Room();
+            Room room2 = new Room();
 
             // Appending
-            aps.AddChild(kitchen);
-            aps.AddChild(livingRoom);
+            aps.AddChild(room1);
+            aps.AddChild(room2);
 
-            for (int i = 0; i < 4; ++i)
-            {
-                WallElement wall1 = new WallElement();
-                WallElement wall2 = new WallElement();
 
-                kitchen.AddChild(wall1);
-                livingRoom.AddChild(wall2);
-            }
-
-            Console.WriteLine("Appending\n\n");
+            Console.WriteLine("Initial tree");
             PrintTree(aps);
-            Console.WriteLine("=========\n\n");
+            Console.WriteLine();
 
-            // Renaming + appending
-            kitchen.Rename("Кухня");
-            livingRoom.Children.First().Rename("Стена из вагонки");
-            livingRoom.AddChild(new WallElement());
-            aps.AddChild(bedroom);
-
-            Console.WriteLine("Renaming + appending\n\n");
+            Console.WriteLine("Removed room1");
+            aps.RemoveChild(room1);
             PrintTree(aps);
-            Console.WriteLine("=========\n\n");
+            Console.WriteLine();
 
 
-            // Removing
-            aps.RemoveChild(bedroom);
-
-            Console.WriteLine("Removing\n\n");
+            Console.WriteLine("Added room");
+            aps.AddChild(new Room());
             PrintTree(aps);
-            Console.WriteLine("=========\n\n");
+            Console.WriteLine();
 
-            // Rename error
-            var kitchen2 = new Room();
-            aps.AddChild(kitchen2);
-            kitchen2.Rename("Кухня");
-
-
-            Console.WriteLine("Rename on existing check");
+            Console.WriteLine("Added room");
+            aps.AddChild(new Room());
             PrintTree(aps);
-            Console.WriteLine("=========\n\n");
+            Console.WriteLine();
+
             Console.ReadKey();
+
         }
 
         private static void PrintTree(IElement root)
