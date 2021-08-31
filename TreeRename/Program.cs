@@ -55,11 +55,10 @@ namespace TreeRename
             // Rename error
             var kitchen2 = new Room();
             aps.AddChild(kitchen2);
-            bool status = kitchen2.Rename("Кухня");
+            kitchen2.Rename("Кухня");
 
 
-            Console.WriteLine("Rename error check");
-            Console.WriteLine($"Rename status: {status}\n\n");
+            Console.WriteLine("Rename on existing check");
             PrintTree(aps);
             Console.WriteLine("=========\n\n");
             Console.ReadKey();

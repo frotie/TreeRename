@@ -9,9 +9,9 @@ namespace TreeRename.TreeElements
     public interface IElement
     {
         string Name { get; set; }
-        int ElementNumber { get; set; }
         string BaseName { get; }
         IElement BaseElement { get; set; }
+        NameResolver NameResolver { get; set; }
         List<IElement> Children { get; }
         bool AddChild(IElement child);
         bool RemoveChild(IElement child);
