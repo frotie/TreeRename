@@ -27,7 +27,7 @@ namespace TreeRename.TreeElements
 
             child.NameResolver = NameResolver;
             child.BaseElement = this;
-            child.Name = NameResolver.AddElement(child);
+            child.Name = NameResolver.GetName(child);
             Children.Add(child);
 
             return true;

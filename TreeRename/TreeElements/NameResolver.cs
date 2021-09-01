@@ -8,69 +8,103 @@ namespace TreeRename.TreeElements
 {
     public class NameResolver
     {
-        private Dictionary<string, List<string>> _namesCollection;
+        // key - BaseName of Element
+        private Dictionary<string, List<ElementToDelete>> _elements;
         public NameResolver()
         {
-            _namesCollection = new Dictionary<string, List<string>>();
+            _elements = new Dictionary<string, List<ElementToDelete>>();
+        }
+
+        public string GetName(IElement element)
+            => GetNameWithNumber(element);
+
+        public string Rename(IElement element, string name)
+        {
+            RemoveElement(element);
+            return GetNameWithNumber(element, name);
         }
 
         public void RemoveElement(IElement element)
         {
-            if(_namesCollection.ContainsKey(element.BaseName))
+            if (_elements.Any(e => e.Key == element.BaseName))
             {
-                _namesCollection[element.BaseName].Remove(element.Name);
+                var namesToDelete = _elements.First(e => e.Key == element.BaseName);
+                var toDelete = namesToDelete.Value.First(e => e.Name == GetSourseName(element.Name));
+
+                toDelete.FreeNumbers.Add(GetNumberFromName(element.Name));
+                toDelete.ElementsCount--;
+
+                if(toDelete.ElementsCount == 0)
+                {
+                    namesToDelete.Value.Remove(toDelete);
+                }
             }
         }
 
-        public string AddElement(IElement element)
+        private string GetNameWithNumber(IElement element, string newName = null)
         {
-            string name = NormalizeName(element, element.Name);
-            if (_namesCollection.ContainsKey(element.BaseName))
+            if (!_elements.Any(e => e.Key == element.BaseName))
+                _elements.Add(element.BaseName, new List<ElementToDelete>());
+
+            string name = GetSourseName(newName ?? element.Name);
+            int number = GetNameNumber(element.BaseName, name);
+
+            return name + " " + number.ToString();
+        }
+
+        private int GetNameNumber(string baseName, string normalizedName)
+        {
+            int number = 0;
+            List<ElementToDelete> baseElements = _elements.First(e => e.Key == baseName).Value;
+
+            if (baseElements.Any(t => t.Name == normalizedName))
             {
-                _namesCollection[element.BaseName].Add(name);
+                var toDelete = baseElements.First(t => t.Name == normalizedName);
+                toDelete.ElementsCount++;
+                if (toDelete.FreeNumbers.Count > 0)
+                {
+                    number = toDelete.FreeNumbers.First();
+                    toDelete.FreeNumbers.Remove(number);
+                }
+                else
+                {
+                    number = toDelete.ElementsCount;
+                }
             }
             else
             {
-                _namesCollection.Add(element.BaseName, new List<string> { name });
+                var el = new ElementToDelete(normalizedName);
+                baseElements.Add(el);
+                el.ElementsCount++;
+
+                number = el.ElementsCount;
             }
 
-            return name;
+            return number;
         }
-
-        public string Rename(IElement element, string name)
+        private int GetNumberFromName(string name)
         {
-            string result = NormalizeName(element, name);
-
-            int index = _namesCollection[element.BaseName].IndexOf(element.Name);
-            _namesCollection[element.BaseName][index] = result;
-
-            return result;
+            if (!name.Contains(' ')) throw new ArgumentException("Element name gave in incorrect format");
+            return int.Parse(name.Split(' ').Last());
         }
-
-        private string NormalizeName(IElement element, string name)
+        private string GetSourseName(string name)
         {
-            string result = name + " 1";
+            if (!name.Contains(' ')) 
+                return name;
 
-            if (!_namesCollection.ContainsKey(element.BaseName))
-                return result;
-
-            int recordsCount = _namesCollection[element.BaseName].Count;
-            bool isOverflow = true;
-
-            for (int i = 0; i < recordsCount; ++i)
-            {
-                result = name + " " + (i + 1).ToString();
-                if (_namesCollection[element.BaseName].Any(elName => elName == result))
-                    continue;
-
-                isOverflow = false;
-                break;
-            }
-
-            if (isOverflow)
-                result = name + " " + (recordsCount + 1).ToString();
-
-            return result;
+            var arr = name.Split(' ');
+            return string.Join("", name.Split(' ').TakeWhile(o => o != arr.Last()));
+        }
+    }
+    internal class ElementToDelete
+    {
+        public string Name { get; set; }
+        public int ElementsCount { get; set; }
+        public List<int> FreeNumbers { get; set; }
+        public ElementToDelete(string name = null)
+        {
+            Name = name;
+            FreeNumbers = new List<int>();
         }
     }
 }
