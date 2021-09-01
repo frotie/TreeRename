@@ -63,7 +63,7 @@ namespace TreeRename.TreeElements
                 toDelete.ElementsCount++;
                 if (toDelete.FreeNumbers.Count > 0)
                 {
-                    number = toDelete.FreeNumbers.First();
+                    number = toDelete.FreeNumbers.Min();
                     toDelete.FreeNumbers.Remove(number);
                 }
                 else
