@@ -30,6 +30,15 @@ namespace TreeRename
             PrintTree(aps);
             Console.WriteLine();
 
+            Console.WriteLine("Renamed room2 to kitchen");
+            room2.Rename("kitchen");
+            PrintTree(aps);
+            Console.WriteLine();
+
+            Console.WriteLine("Added room");
+            aps.AddChild(new Room());
+            PrintTree(aps);
+            Console.WriteLine();
 
             Console.WriteLine("Added room");
             aps.AddChild(new Room());

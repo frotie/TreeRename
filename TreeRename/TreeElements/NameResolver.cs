@@ -8,47 +8,69 @@ namespace TreeRename.TreeElements
 {
     public class NameResolver
     {
-        private Dictionary<string, List<string>> _typesCollection;
+        private Dictionary<string, List<string>> _namesCollection;
         public NameResolver()
         {
-            _typesCollection = new Dictionary<string, List<string>>();
+            _namesCollection = new Dictionary<string, List<string>>();
         }
 
         public void RemoveElement(IElement element)
         {
-            if(_typesCollection.ContainsKey(element.BaseName))
+            if(_namesCollection.ContainsKey(element.BaseName))
             {
-                _typesCollection[element.BaseName].Remove(element.Name);
+                _namesCollection[element.BaseName].Remove(element.Name);
             }
         }
-        
+
         public string AddElement(IElement element)
         {
-            if(!_typesCollection.ContainsKey(element.BaseName))
+            string name = NormalizeName(element, element.Name);
+            if (_namesCollection.ContainsKey(element.BaseName))
             {
-                _typesCollection.Add(element.BaseName, new List<string>() { element.Name });
+                _namesCollection[element.BaseName].Add(name);
             }
             else
             {
-                _typesCollection[element.BaseName].Add(element.Name);
+                _namesCollection.Add(element.BaseName, new List<string> { name });
             }
 
-            element.Name = Rename(element);
-            return element.Name;
+            return name;
         }
 
-        public string Rename(IElement element, string name = null)
+        public string Rename(IElement element, string name)
         {
-            if (name == null) name = element.BaseName;
-            for (int i = 0; i < _typesCollection[element.BaseName].Count; ++i)
+            string result = NormalizeName(element, name);
+
+            int index = _namesCollection[element.BaseName].IndexOf(element.Name);
+            _namesCollection[element.BaseName][index] = result;
+
+            return result;
+        }
+
+        private string NormalizeName(IElement element, string name)
+        {
+            string result = name + " 1";
+
+            if (!_namesCollection.ContainsKey(element.BaseName))
+                return result;
+
+            int recordsCount = _namesCollection[element.BaseName].Count;
+            bool isOverflow = true;
+
+            for (int i = 0; i < recordsCount; ++i)
             {
-                if (_typesCollection[element.BaseName].Any(elName => elName == name + " " + (i + 1).ToString()))
-                {
+                result = name + " " + (i + 1).ToString();
+                if (_namesCollection[element.BaseName].Any(elName => elName == result))
                     continue;
-                }
-                return name + " " + (i + 1).ToString();
+
+                isOverflow = false;
+                break;
             }
-            return name + " " + _typesCollection[element.BaseName].Count.ToString();
+
+            if (isOverflow)
+                result = name + " " + (recordsCount + 1).ToString();
+
+            return result;
         }
     }
 }

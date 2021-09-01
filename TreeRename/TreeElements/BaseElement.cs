@@ -21,7 +21,6 @@ namespace TreeRename.TreeElements
             NameResolver = new NameResolver();
         }
 
-        // TODO: Check for an existing name?
         public bool AddChild(IElement child)
         {
             if (child == null) return false;
