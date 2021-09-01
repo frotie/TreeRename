@@ -42,7 +42,6 @@ namespace TreeRename
             Console.WriteLine();
 
             Console.ReadKey();
-
         }
 
         private static void PrintTree(IElement root)
