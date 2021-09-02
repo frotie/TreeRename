@@ -28,6 +28,7 @@ namespace TreeRename.TreeElements
             child.NameResolver = NameResolver;
             child.BaseElement = this;
             child.Name = NameResolver.GetName(child);
+
             Children.Add(child);
 
             return true;
@@ -44,11 +45,10 @@ namespace TreeRename.TreeElements
 
         public bool Rename(string newName)
         {
-            if(string.IsNullOrEmpty(newName)) 
+            if(string.IsNullOrEmpty(newName) || !NameResolver.Rename(this, newName)) 
                 return false;
 
-            Name = NameResolver.Rename(this, newName);
-
+            Name = newName;
             return true;
         }
     }

@@ -9,76 +9,55 @@ namespace TreeRename.TreeElements
     public class NameResolver
     {
         // key - BaseName of Element
-        private Dictionary<string, List<ElementToDelete>> _elements;
+        private Dictionary<string, ElementStat> _elements;
         public NameResolver()
         {
-            _elements = new Dictionary<string, List<ElementToDelete>>();
+            _elements = new Dictionary<string, ElementStat>();
         }
 
         public string GetName(IElement element)
-            => GetNameWithNumber(element);
-
-        public string Rename(IElement element, string name)
         {
-            RemoveElement(element);
-            return GetNameWithNumber(element, name);
+            if (!_elements.ContainsKey(element.BaseName))
+                _elements.Add(element.BaseName, new ElementStat());
+
+            return element.BaseName + " " + GetElementNumber(element);
         }
 
+        // Throw exception if element was not added to the statistics
+        public bool Rename(IElement element, string name)
+        {
+            var elStat = _elements[element.BaseName];
+            if(!elStat.CustomNames.Contains(name))
+            {
+                RemoveElement(element);
+                elStat.CustomNames.Add(name);
+                return true;
+            }
+            return false;
+        }
+
+        // Throw exception if element was not added to the statistics
         public void RemoveElement(IElement element)
         {
-            if (_elements.Any(e => e.Key == element.BaseName))
-            {
-                var namesToDelete = _elements.First(e => e.Key == element.BaseName);
-                var toDelete = namesToDelete.Value.First(e => e.Name == GetSourseName(element.Name));
+            var elStat = _elements[element.BaseName];
 
-                toDelete.FreeNumbers.Add(GetNumberFromName(element.Name));
-                toDelete.ElementsCount--;
-
-                if(toDelete.ElementsCount == 0)
-                {
-                    namesToDelete.Value.Remove(toDelete);
-                }
-            }
+            elStat.FreeNumbers.Add(GetNumberFromName(element.Name));
+            elStat.ElementsCount--;
         }
 
-        private string GetNameWithNumber(IElement element, string newName = null)
+        private int GetElementNumber(IElement element)
         {
-            if (!_elements.Any(e => e.Key == element.BaseName))
-                _elements.Add(element.BaseName, new List<ElementToDelete>());
+            ElementStat elementStat = _elements[element.BaseName];
+            elementStat.ElementsCount++;
 
-            string name = GetSourseName(newName ?? element.Name);
-            int number = GetNameNumber(element.BaseName, name);
-
-            return name + " " + number.ToString();
-        }
-
-        private int GetNameNumber(string baseName, string normalizedName)
-        {
-            int number = 0;
-            List<ElementToDelete> baseElements = _elements.First(e => e.Key == baseName).Value;
-
-            if (baseElements.Any(t => t.Name == normalizedName))
+            int number;
+            if (elementStat.FreeNumbers.Count > 0)
             {
-                var toDelete = baseElements.First(t => t.Name == normalizedName);
-                toDelete.ElementsCount++;
-                if (toDelete.FreeNumbers.Count > 0)
-                {
-                    number = toDelete.FreeNumbers.Min();
-                    toDelete.FreeNumbers.Remove(number);
-                }
-                else
-                {
-                    number = toDelete.ElementsCount;
-                }
+                number = elementStat.FreeNumbers.Min();
+                elementStat.FreeNumbers.Remove(number);
             }
             else
-            {
-                var el = new ElementToDelete(normalizedName);
-                baseElements.Add(el);
-                el.ElementsCount++;
-
-                number = el.ElementsCount;
-            }
+                number = elementStat.ElementsCount;
 
             return number;
         }
@@ -87,23 +66,15 @@ namespace TreeRename.TreeElements
             if (!name.Contains(' ')) throw new ArgumentException("Element name gave in incorrect format");
             return int.Parse(name.Split(' ').Last());
         }
-        private string GetSourseName(string name)
-        {
-            if (!name.Contains(' ')) 
-                return name;
-
-            var arr = name.Split(' ');
-            return string.Join("", name.Split(' ').TakeWhile(o => o != arr.Last()));
-        }
     }
-    internal class ElementToDelete
+    internal class ElementStat
     {
-        public string Name { get; set; }
         public int ElementsCount { get; set; }
         public List<int> FreeNumbers { get; set; }
-        public ElementToDelete(string name = null)
+        public List<string> CustomNames { get; set; }
+        public ElementStat(string name = null)
         {
-            Name = name;
+            CustomNames = new List<string>();
             FreeNumbers = new List<int>();
         }
     }

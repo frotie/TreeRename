@@ -15,7 +15,6 @@ namespace TreeRename
 
             Room room1 = new Room();
             Room room2 = new Room();
-            Room room3 = new Room();
 
             // Appending
             aps.AddChild(room1);
