@@ -44,8 +44,16 @@ namespace TreeRename
             PrintTree(aps);
             Console.WriteLine();
 
+            Room tryKitchen = new Room();
+
             Console.WriteLine("Added room");
-            aps.AddChild(new Room());
+            aps.AddChild(tryKitchen);
+            PrintTree(aps);
+            Console.WriteLine();
+
+            bool status = room2.Rename("kitchen");
+            Console.WriteLine("Try rename room3 to kitchen");
+            Console.WriteLine($"Status of renaming: {status}");
             PrintTree(aps);
             Console.WriteLine();
 
