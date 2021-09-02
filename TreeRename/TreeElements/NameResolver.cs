@@ -23,7 +23,7 @@ namespace TreeRename.TreeElements
             return element.BaseName + " " + GetElementNumber(element);
         }
 
-        // Throw exception if element was not added to the statistics
+        // Throw exception if element was not added to the statistics. Call GetName first
         public bool Rename(IElement element, string name)
         {
             var elStat = _elements[element.BaseName];
@@ -36,12 +36,22 @@ namespace TreeRename.TreeElements
             return false;
         }
 
-        // Throw exception if element was not added to the statistics
+        // Throw exception if element was not added to the statistics. Call GetName first
         public void RemoveElement(IElement element)
         {
             var elStat = _elements[element.BaseName];
 
-            elStat.FreeNumbers.Add(GetNumberFromName(element.Name));
+            try
+            {
+                elStat.FreeNumbers.Add(GetNumberFromName(element.Name));
+            }
+            catch(ArgumentException)
+            {
+                if(elStat.CustomNames.Contains(element.Name))
+                {
+                    elStat.CustomNames.Remove(element.Name);
+                }
+            }
             elStat.ElementsCount--;
         }
 

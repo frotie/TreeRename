@@ -51,8 +51,8 @@ namespace TreeRename
             PrintTree(aps);
             Console.WriteLine();
 
-            bool status = room2.Rename("kitchen");
-            Console.WriteLine("Try rename room3 to kitchen");
+            bool status = room2.Rename("living room");
+            Console.WriteLine("Try rename kitchen");
             Console.WriteLine($"Status of renaming: {status}");
             PrintTree(aps);
             Console.WriteLine();
