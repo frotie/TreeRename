@@ -41,17 +41,22 @@ namespace TreeRename.TreeElements
         {
             var elStat = _elements[element.BaseName];
 
-            try
+            // if element name is custom
+            if (elStat.CustomNames.Contains(element.Name))
             {
-                elStat.FreeNumbers.Add(GetNumberFromName(element.Name));
+                elStat.CustomNames.Remove(element.Name);
             }
-            catch(ArgumentException)
+            else
             {
-                if(elStat.CustomNames.Contains(element.Name))
+                try
                 {
-                    elStat.CustomNames.Remove(element.Name);
+                    elStat.FreeNumbers.Add(GetNumberFromName(element.Name));
+                }
+                catch (ArgumentException)
+                {
                 }
             }
+            
             elStat.ElementsCount--;
         }
 
