@@ -87,7 +87,7 @@ namespace TreeRename.TreeElements
         public int ElementsCount { get; set; }
         public List<int> FreeNumbers { get; set; }
         public List<string> CustomNames { get; set; }
-        public ElementStat(string name = null)
+        public ElementStat()
         {
             CustomNames = new List<string>();
             FreeNumbers = new List<int>();
