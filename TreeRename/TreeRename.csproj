@@ -45,15 +45,18 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TreeElements\Apartments.cs" />
-    <Compile Include="TreeElements\BaseElement.cs" />
+    <Compile Include="TreeElements\BaseElements\Apartments.cs" />
+    <Compile Include="TreeElements\BaseElements\BaseElement.cs" />
     <Compile Include="TreeElements\IElement.cs" />
     <Compile Include="TreeElements\NameResolver.cs" />
-    <Compile Include="TreeElements\Room.cs" />
-    <Compile Include="TreeElements\WallElement.cs" />
+    <Compile Include="TreeElements\BaseElements\Room.cs" />
+    <Compile Include="TreeElements\SpecialElements\FloorElement.cs" />
+    <Compile Include="TreeElements\SpecialElements\ISpecialElement.cs" />
+    <Compile Include="TreeElements\BaseElements\WallElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TreeRename.TreeElements.SpecialElements;
 
-namespace TreeRename.TreeElements
+namespace TreeRename.TreeElements.BaseElements
 {
     internal abstract class BaseElement : IElement
     {
@@ -25,7 +26,14 @@ namespace TreeRename.TreeElements
         {
             if (child == null) return false;
 
-            child.NameResolver = NameResolver;
+            if(child is ISpecialElement)
+            {
+                child.NameResolver = new NameResolver();
+            }
+            else
+            {
+                child.NameResolver = NameResolver;
+            }
             child.BaseElement = this;
             child.Name = NameResolver.GetName(child);
 

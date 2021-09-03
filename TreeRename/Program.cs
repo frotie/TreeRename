@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TreeRename.TreeElements;
+using TreeRename.TreeElements.BaseElements;
+using TreeRename.TreeElements.SpecialElements;
 
 namespace TreeRename
 {
@@ -13,59 +15,45 @@ namespace TreeRename
         {
             Apartments aps = new Apartments();
 
-            Room room1 = new Room();
-            Room room2 = new Room();
+            FloorElement fe1 = new FloorElement();
+            FloorElement fe2 = new FloorElement();
+
 
             // Appending
-            aps.AddChild(room1);
-            aps.AddChild(room2);
+            aps.AddChild(fe1);
+            aps.AddChild(fe2);
 
-            Console.WriteLine("Initial tree");
+            FillFloor(fe1);
+            FillFloor(fe2);
+
             PrintTree(aps);
-            Console.WriteLine();
-
-            Console.WriteLine("Removed room1");
-            aps.RemoveChild(room1);
-            PrintTree(aps);
-            Console.WriteLine();
-
-            Console.WriteLine("Renamed room2 to kitchen");
-            room2.Rename("kitchen");
-            PrintTree(aps);
-            Console.WriteLine();
-
-            Console.WriteLine("Added room");
-            aps.AddChild(new Room());
-            PrintTree(aps);
-            Console.WriteLine();
-
-            Console.WriteLine("Added room");
-            aps.AddChild(new Room());
-            PrintTree(aps);
-            Console.WriteLine();
-
-            Room tryKitchen = new Room();
-
-            Console.WriteLine("Added room");
-            aps.AddChild(tryKitchen);
-            PrintTree(aps);
-            Console.WriteLine();
-
-            bool status = room2.Rename("living room");
-            Console.WriteLine("Try rename kitchen");
-            Console.WriteLine($"Status of renaming: {status}");
-            PrintTree(aps);
-            Console.WriteLine();
+            Console.ReadKey();
 
             Console.ReadKey();
         }
 
-        private static void PrintTree(IElement root)
+        private static void FillFloor(FloorElement floor)
         {
+            for(int i = 0; i < 2; ++i)
+            {
+                var room = new Room();
+                floor.AddChild(room);
+                
+                for(int j = 0; j < 4; ++j)
+                {
+                    room.AddChild(new WallElement());
+                }
+            }
+        }
+
+        private static void PrintTree(IElement root, int row = 0)
+        {
+            
+            string offset = string.Join("", Enumerable.Repeat("  ", row));
             foreach (var el in root.Children)
             {
-                Console.WriteLine(el.Name + " impl of " + el.BaseElement?.Name);
-                PrintTree(el);
+                Console.WriteLine(offset + el.Name + (el.Children.Count > 0 ? ":":""));
+                PrintTree(el, row + 1);
             }
         }
     }
