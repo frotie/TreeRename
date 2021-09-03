@@ -8,17 +8,16 @@ namespace TreeRename.TreeElements
 {
     public class NameResolver
     {
-        // key - BaseName of Element
-        private Dictionary<string, ElementStat> _elements;
+        private Dictionary<Type, ElementStat> _elements;
         public NameResolver()
         {
-            _elements = new Dictionary<string, ElementStat>();
+            _elements = new Dictionary<Type, ElementStat>();
         }
 
         public string GetName(IElement element)
         {
-            if (!_elements.ContainsKey(element.BaseName))
-                _elements.Add(element.BaseName, new ElementStat());
+            if (!_elements.ContainsKey(element.GetType()))
+                _elements.Add(element.GetType(), new ElementStat());
 
             return element.BaseName + " " + GetElementNumber(element);
         }
@@ -26,7 +25,7 @@ namespace TreeRename.TreeElements
         // Throw exception if element was not added to the statistics. Call GetName first
         public bool Rename(IElement element, string name)
         {
-            var elStat = _elements[element.BaseName];
+            var elStat = _elements[element.GetType()];
             if(!elStat.CustomNames.Contains(name))
             {
                 RemoveElement(element);
@@ -39,7 +38,7 @@ namespace TreeRename.TreeElements
         // Throw exception if element was not added to the statistics. Call GetName first
         public void RemoveElement(IElement element)
         {
-            var elStat = _elements[element.BaseName];
+            var elStat = _elements[element.GetType()];
 
             // if element name is custom
             if (elStat.CustomNames.Contains(element.Name))
@@ -62,7 +61,7 @@ namespace TreeRename.TreeElements
 
         private int GetElementNumber(IElement element)
         {
-            ElementStat elementStat = _elements[element.BaseName];
+            ElementStat elementStat = _elements[element.GetType()];
             elementStat.ElementsCount++;
 
             int number;

@@ -47,6 +47,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TreeElements\BaseElements\Apartments.cs" />
     <Compile Include="TreeElements\BaseElements\BaseElement.cs" />
+    <Compile Include="TreeElements\BaseElements\BigRoom.cs" />
     <Compile Include="TreeElements\IElement.cs" />
     <Compile Include="TreeElements\NameResolver.cs" />
     <Compile Include="TreeElements\BaseElements\Room.cs" />

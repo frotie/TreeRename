@@ -15,31 +15,25 @@ namespace TreeRename
         {
             Apartments aps = new Apartments();
 
-            FloorElement fe1 = new FloorElement();
-            FloorElement fe2 = new FloorElement();
+            var room = new Room();
+            var bRoom = new BigRoom();
 
-
-            // Appending
-            aps.AddChild(fe1);
-            aps.AddChild(fe2);
-
-            FillFloor(fe1);
-            FillFloor(fe2);
+            aps.AddChild(room);
+            aps.AddChild(bRoom);
 
             PrintTree(aps);
-            Console.ReadKey();
 
             Console.ReadKey();
         }
 
-        private static void FillFloor(FloorElement floor)
+        private static void AddMuchElements(IElement root, int rows, int cols)
         {
-            for(int i = 0; i < 2; ++i)
+            for(int i = 0; i < rows; ++i)
             {
                 var room = new Room();
-                floor.AddChild(room);
-                
-                for(int j = 0; j < 4; ++j)
+                root.AddChild(room);
+
+                for(int j = 0; j < cols; ++j)
                 {
                     room.AddChild(new WallElement());
                 }
