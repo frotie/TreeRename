@@ -26,17 +26,7 @@ namespace TreeRename.TreeElements.BaseElements
         {
             if (child == null) return false;
 
-            if(child is ISpecialElement)
-            {
-                child.NameResolver = new NameResolver();
-            }
-            else
-            {
-                child.NameResolver = NameResolver;
-            }
-            child.BaseElement = this;
-            child.Name = NameResolver.GetName(child);
-
+            InitChild(child, NameResolver.GetName(child));
             Children.Add(child);
 
             return true;
@@ -58,6 +48,38 @@ namespace TreeRename.TreeElements.BaseElements
 
             Name = newName;
             return true;
+        }
+
+        public int AddChildren(List<IElement> children)
+        {
+            var names = NameResolver.GetNames(children.First(), children.Count);
+
+            for(int i = 0; i < names.Count; ++i)
+            {
+                InitChild(children[i], names[i]);
+                Children.Add(children[i]);
+            }
+
+            return names.Count;
+        }
+
+        public int RemoveChildren(List<IElement> children)
+        {
+            return 0;
+        }
+
+        private void InitChild(IElement child, string name)
+        {
+            if (child is ISpecialElement)
+            {
+                child.NameResolver = new NameResolver();
+            }
+            else
+            {
+                child.NameResolver = NameResolver;
+            }
+            child.Name = name;
+            child.BaseElement = this;
         }
     }
 }

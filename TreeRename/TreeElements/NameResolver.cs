@@ -19,8 +19,36 @@ namespace TreeRename.TreeElements
             if (!_elements.ContainsKey(element.GetType()))
                 _elements.Add(element.GetType(), new ElementStat());
 
-            return element.BaseName + " " + GetElementNumber(element);
+            return BuildStandartName(element, GetElementNumber(element));
         }
+
+        public List<string> GetNames(IElement element, int count)
+        {
+            var result = new List<string>();
+            var stat = new ElementStat();
+
+            if (!_elements.ContainsKey(element.GetType()))
+                _elements.Add(element.GetType(), stat);
+            else 
+                stat = _elements[element.GetType()];
+
+            foreach(int number in stat.FreeNumbers)
+            {
+                result.Add(BuildStandartName(element, number));
+                stat.ElementsCount++;
+                stat.FreeNumbers.Remove(number);
+            }
+            result.AddRange(Enumerable
+                .Range(result.Count, count)
+                .Select(n => BuildStandartName(element, (stat.ElementsCount++) + n)));
+
+            return result;
+        }
+
+        //private List<int> GetNumbers()
+        //{
+
+        //}
 
         // Throw exception if element was not added to the statistics. Call GetName first
         public bool Rename(IElement element, string name)
@@ -59,6 +87,8 @@ namespace TreeRename.TreeElements
             elStat.ElementsCount--;
         }
 
+        private string BuildStandartName(IElement element, int number) => 
+            element.BaseName + " " + number.ToString();
         private int GetElementNumber(IElement element)
         {
             ElementStat elementStat = _elements[element.GetType()];

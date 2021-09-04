@@ -13,15 +13,30 @@ namespace TreeRename
     {
         static void Main(string[] args)
         {
+            int elementsCount = (int)1e6;
             Apartments aps = new Apartments();
 
-            var room = new Room();
-            var bRoom = new BigRoom();
+            var list = new List<IElement>();
+            for (int i = 0; i < elementsCount; ++i)
+            {
+                list.Add(new Room());
+            }
 
-            aps.AddChild(room);
-            aps.AddChild(bRoom);
+            var time = DateTime.Now;
+            aps.AddChildren(list);
+            TimeSpan resTime = DateTime.Now - time;
 
-            PrintTree(aps);
+            Console.WriteLine($"Spec method time: {resTime.TotalMilliseconds}ms");
+
+            Apartments aps1 = new Apartments();
+
+            time = DateTime.Now;
+            for(int i = 0; i < elementsCount; ++i)
+            {
+                aps1.AddChild(list[i]);
+            }
+            resTime = DateTime.Now - time;
+            Console.WriteLine($"Often method time: {resTime.TotalMilliseconds}ms");
 
             Console.ReadKey();
         }
