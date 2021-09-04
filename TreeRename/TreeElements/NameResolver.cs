@@ -22,9 +22,9 @@ namespace TreeRename.TreeElements
             return BuildStandartName(element, GetElementNumber(element));
         }
 
-        public List<string> GetNames(IElement element, int count)
+        public string[] GetNames(IElement element, int count)
         {
-            var result = new List<string>();
+            var result = new string[count];
             var stat = new ElementStat();
 
             if (!_elements.ContainsKey(element.GetType()))
@@ -32,23 +32,45 @@ namespace TreeRename.TreeElements
             else 
                 stat = _elements[element.GetType()];
 
-            foreach(int number in stat.FreeNumbers)
+            var freeSorted = stat.FreeNumbers.ToList();
+            var freeCount = freeSorted.Count;
+             
+
+            for (int i = 0; i < count; ++i)
             {
-                result.Add(BuildStandartName(element, number));
-                stat.ElementsCount++;
-                stat.FreeNumbers.Remove(number);
+                int number;
+                if (i < freeCount)
+                    number = freeSorted[i];
+                else
+                    number = stat.ElementsCount + i + 1;
+
+                result[i] = BuildStandartName(element, number);
             }
-            result.AddRange(Enumerable
-                .Range(result.Count, count)
-                .Select(n => BuildStandartName(element, (stat.ElementsCount++) + n)));
+
+            stat.ElementsCount += count;
+            stat.FreeNumbers.RemoveRange(0, count > freeCount ? freeCount : count);
 
             return result;
         }
 
-        //private List<int> GetNumbers()
-        //{
+        public void RemoveElements(List<IElement> elements)
+        {
+            var stat = _elements[elements.First().GetType()];
 
-        //}
+            foreach(var el in elements)
+            {
+                try
+                {
+                    stat.FreeNumbers.Add(GetNumberFromName(el.Name));
+                }
+                catch(ArgumentException)
+                {
+                    stat.CustomNames.Remove(el.Name);
+                }
+            }
+
+            stat.ElementsCount -= elements.Count;
+        }
 
         // Throw exception if element was not added to the statistics. Call GetName first
         public bool Rename(IElement element, string name)

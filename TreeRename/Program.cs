@@ -13,32 +13,81 @@ namespace TreeRename
     {
         static void Main(string[] args)
         {
-            int elementsCount = (int)1e6;
-            Apartments aps = new Apartments();
+            int elementsCount = (int)5e2;
+            Apartments aps1 = new Apartments();
+            Apartments aps2 = new Apartments();
 
+
+            AppendElements(aps1, aps2, elementsCount);
+
+
+
+            Console.WriteLine("Deleting some elements");
+            int elsToDeleteCount = new Random().Next(0, elementsCount);
+
+            var elementsToDelete1 = Enumerable
+                .Range(0, elsToDeleteCount)
+                .Select(e => aps1.Children[e])
+                .ToList();
+
+            var elementsToDelete2 = Enumerable
+                .Range(0, elsToDeleteCount)
+                .Select(e => aps2.Children[e])
+                .ToList();
+
+            Console.WriteLine($"Elements to delete: {elsToDeleteCount}");
+
+            var time = DateTime.Now;
+            aps1.RemoveChildren(elementsToDelete1);
+            TimeSpan resSpecTimeRemove = DateTime.Now - time;
+            Console.WriteLine($"[-] Spec method time: {resSpecTimeRemove.TotalMilliseconds}ms");
+
+            time = DateTime.Now;
+            for (int i = 0; i < elsToDeleteCount; ++i)
+            {
+                aps2.RemoveChild(elementsToDelete2[i]);
+            }
+            TimeSpan resOftenTimeRemove = DateTime.Now - time;
+
+            Console.WriteLine($"[-] Usual method time: {resOftenTimeRemove.TotalMilliseconds}ms\n");
+
+
+            AppendElements(aps1, aps2, elementsCount);
+
+            Console.WriteLine($"First tree elements: {aps1.Children.Count}");
+            Console.WriteLine($"Second tree elements: {aps2.Children.Count}");
+
+            PrintTree(aps1);
+            Console.WriteLine("=========================================");
+            PrintTree(aps2);
+
+            Console.ReadKey();
+        }
+
+        private static void AppendElements(IElement aps1, IElement aps2, int elementsCount)
+        {
             var list = new List<IElement>();
             for (int i = 0; i < elementsCount; ++i)
             {
                 list.Add(new Room());
             }
 
+            Console.WriteLine("Appending elements");
+            Console.WriteLine($"All elements count to append: {list.Count}");
+
             var time = DateTime.Now;
-            aps.AddChildren(list);
-            TimeSpan resTime = DateTime.Now - time;
-
-            Console.WriteLine($"Spec method time: {resTime.TotalMilliseconds}ms");
-
-            Apartments aps1 = new Apartments();
+            aps1.AddChildren(list);
+            TimeSpan resSpecTimeAdd = DateTime.Now - time;
+            Console.WriteLine($"[-] Spec method time: {resSpecTimeAdd.TotalMilliseconds}ms");
 
             time = DateTime.Now;
-            for(int i = 0; i < elementsCount; ++i)
+            for (int i = 0; i < elementsCount; ++i)
             {
-                aps1.AddChild(list[i]);
+                aps2.AddChild(list[i]);
             }
-            resTime = DateTime.Now - time;
-            Console.WriteLine($"Often method time: {resTime.TotalMilliseconds}ms");
+            TimeSpan resOftenTimeAdd = DateTime.Now - time;
 
-            Console.ReadKey();
+            Console.WriteLine($"[-] Usual method time: {resOftenTimeAdd.TotalMilliseconds}ms\n");
         }
 
         private static void AddMuchElements(IElement root, int rows, int cols)
@@ -57,7 +106,6 @@ namespace TreeRename
 
         private static void PrintTree(IElement root, int row = 0)
         {
-            
             string offset = string.Join("", Enumerable.Repeat("  ", row));
             foreach (var el in root.Children)
             {

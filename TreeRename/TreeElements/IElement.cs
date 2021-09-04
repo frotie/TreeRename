@@ -16,7 +16,7 @@ namespace TreeRename.TreeElements
         bool AddChild(IElement child);
         int AddChildren(List<IElement> children);
         bool RemoveChild(IElement child);
-        int RemoveChildren(List<IElement> children);
+        void RemoveChildren(List<IElement> children);
         bool Rename(string newName);
     }
 }

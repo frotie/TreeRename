@@ -27,7 +27,6 @@ namespace TreeRename.TreeElements.BaseElements
             if (child == null) return false;
 
             InitChild(child, NameResolver.GetName(child));
-            Children.Add(child);
 
             return true;
         }
@@ -54,18 +53,19 @@ namespace TreeRename.TreeElements.BaseElements
         {
             var names = NameResolver.GetNames(children.First(), children.Count);
 
-            for(int i = 0; i < names.Count; ++i)
+            for(int i = 0; i < names.Length; ++i)
             {
                 InitChild(children[i], names[i]);
-                Children.Add(children[i]);
             }
 
-            return names.Count;
+            return names.Length;
         }
 
-        public int RemoveChildren(List<IElement> children)
+        public void RemoveChildren(List<IElement> children)
         {
-            return 0;
+            NameResolver.RemoveElements(children);
+            foreach (var child in children)
+                Children.Remove(child);
         }
 
         private void InitChild(IElement child, string name)
@@ -80,6 +80,7 @@ namespace TreeRename.TreeElements.BaseElements
             }
             child.Name = name;
             child.BaseElement = this;
+            Children.Add(child);
         }
     }
 }
