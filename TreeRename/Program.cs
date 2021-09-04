@@ -13,7 +13,7 @@ namespace TreeRename
     {
         static void Main(string[] args)
         {
-            int elementsCount = (int)5e2;
+            int elementsCount = (int)5e4;
             Apartments aps1 = new Apartments();
             Apartments aps2 = new Apartments();
 
@@ -57,9 +57,9 @@ namespace TreeRename
             Console.WriteLine($"First tree elements: {aps1.Children.Count}");
             Console.WriteLine($"Second tree elements: {aps2.Children.Count}");
 
-            PrintTree(aps1);
-            Console.WriteLine("=========================================");
-            PrintTree(aps2);
+            //PrintTree(aps1);
+            //Console.WriteLine("=========================================");
+            //PrintTree(aps2);
 
             Console.ReadKey();
         }
