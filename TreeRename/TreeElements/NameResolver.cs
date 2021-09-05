@@ -32,7 +32,7 @@ namespace TreeRename.TreeElements
             else 
                 stat = _elements[element.GetType()];
 
-            var freeSorted = stat.FreeNumbers.ToList();
+            var freeSorted = stat.FreeNumbers.OrderBy(el => el).ToList();
             var freeCount = freeSorted.Count;
              
 
