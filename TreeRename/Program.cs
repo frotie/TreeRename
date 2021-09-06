@@ -17,9 +17,9 @@ namespace TreeRename
             Apartments aps1 = new Apartments();
             Apartments aps2 = new Apartments();
 
+            // CRUD(aps1);
 
             AppendElements(aps1, aps2, elementsCount);
-
 
 
             Console.WriteLine("Deleting some elements");
@@ -51,17 +51,39 @@ namespace TreeRename
 
             Console.WriteLine($"[-] Usual method time: {resOftenTimeRemove.TotalMilliseconds}ms\n");
 
-
             AppendElements(aps1, aps2, elementsCount);
 
             Console.WriteLine($"First tree elements: {aps1.Children.Count}");
             Console.WriteLine($"Second tree elements: {aps2.Children.Count}");
 
-            //PrintTree(aps1);
-            //Console.WriteLine("=========================================");
-            //PrintTree(aps2);
 
             Console.ReadKey();
+        }
+
+        private static void CRUD(IElement element)
+        {
+            var room1 = new Room();
+            var room2 = new Room();
+            var room3 = new Room();
+
+            element.AddChildren(room1, room2, room3);
+            PrintTree(element);
+            Console.WriteLine("\n\n");
+
+            element.RemoveChild(room2);
+            PrintTree(element);
+            Console.WriteLine("\n\n");
+
+            room1.Rename("kitchen");
+            PrintTree(element);
+            Console.WriteLine("\n\n");
+
+            element.AddChild(new Room());
+            element.AddChild(new Room());
+            element.AddChild(new Room());
+
+            PrintTree(element);
+            Console.WriteLine("\n\n");
         }
 
         private static void AppendElements(IElement aps1, IElement aps2, int elementsCount)
@@ -76,7 +98,7 @@ namespace TreeRename
             Console.WriteLine($"All elements count to append: {list.Count}");
 
             var time = DateTime.Now;
-            aps1.AddChildren(list);
+            aps1.AddChildren(list.ToArray());
             TimeSpan resSpecTimeAdd = DateTime.Now - time;
             Console.WriteLine($"[-] Spec method time: {resSpecTimeAdd.TotalMilliseconds}ms");
 

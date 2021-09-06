@@ -14,113 +14,101 @@ namespace TreeRename.TreeElements
             _elements = new Dictionary<Type, ElementStat>();
         }
 
-        public string GetName(IElement element)
+        public string GetStandartName(Type itemType, string baseName)
         {
-            if (!_elements.ContainsKey(element.GetType()))
-                _elements.Add(element.GetType(), new ElementStat());
+            if (itemType == null || baseName == null) 
+                throw new ArgumentNullException();
 
-            return BuildStandartName(element, GetElementNumber(element));
+            ElementStat elStat = GetStatOrCreate(itemType, baseName);
+
+            int elNumber = GetNumberForItem(elStat);
+            string name = BuildStandartName(elStat, elNumber);
+
+            return name;
         }
 
-        public string[] GetNames(IElement element, int count)
+        public string[] GetStandartNames(Type itemType, string baseName, int itemCount)
         {
-            var result = new string[count];
-            var stat = new ElementStat();
+            if (itemType == null || itemCount == 0) 
+                throw new ArgumentNullException();
 
-            if (!_elements.ContainsKey(element.GetType()))
-                _elements.Add(element.GetType(), stat);
-            else 
-                stat = _elements[element.GetType()];
+            string[] result = new string[itemCount];
+            ElementStat stat = GetStatOrCreate(itemType, baseName);
 
-            var freeSorted = stat.FreeNumbers.OrderBy(el => el).ToList();
-            var freeCount = freeSorted.Count;
+            int freeCount = stat.FreeNumbers.Count;
              
-
-            for (int i = 0; i < count; ++i)
+            for (int i = 0; i < itemCount; ++i)
             {
                 int number;
                 if (i < freeCount)
-                    number = freeSorted[i];
+                    number = stat.FreeNumbers[i];
                 else
                     number = stat.ElementsCount + i + 1;
 
-                result[i] = BuildStandartName(element, number);
+                result[i] = BuildStandartName(stat, number);
             }
 
-            stat.ElementsCount += count;
-            stat.FreeNumbers.RemoveRange(0, count > freeCount ? freeCount : count);
+            stat.ElementsCount += itemCount;
+            stat.FreeNumbers.RemoveRange(0, Math.Min(itemCount, freeCount));
 
             return result;
         }
 
-        public void RemoveElements(List<IElement> elements)
+        public string ChangeNameInStatistic(Type itemType, string name, string oldName)
         {
-            var stat = _elements[elements.First().GetType()];
+            if (itemType == null || !_elements.ContainsKey(itemType))
+                throw new ArgumentNullException();
 
-            foreach(var el in elements)
+            var elStat = _elements[itemType];
+
+            if (elStat.CustomNames.Contains(name))
+                throw new ArgumentException();
+
+            string result;
+            RemoveElement(itemType, oldName);
+            if (name == elStat.BaseName)
             {
-                try
-                {
-                    stat.FreeNumbers.Add(GetNumberFromName(el.Name));
-                }
-                catch(ArgumentException)
-                {
-                    stat.CustomNames.Remove(el.Name);
-                }
-            }
-
-            stat.ElementsCount -= elements.Count;
-        }
-
-        // Throw exception if element was not added to the statistics. Call GetName first
-        public bool Rename(IElement element, string name)
-        {
-            var elStat = _elements[element.GetType()];
-            if(!elStat.CustomNames.Contains(name))
-            {
-                RemoveElement(element);
-                elStat.CustomNames.Add(name);
-                return true;
-            }
-            return false;
-        }
-
-        // Throw exception if element was not added to the statistics. Call GetName first
-        public void RemoveElement(IElement element)
-        {
-            var elStat = _elements[element.GetType()];
-
-            // if element name is custom
-            if (elStat.CustomNames.Contains(element.Name))
-            {
-                elStat.CustomNames.Remove(element.Name);
+                result = GetStandartName(itemType, elStat.BaseName);
             }
             else
             {
-                try
-                {
-                    elStat.FreeNumbers.Add(GetNumberFromName(element.Name));
-                }
-                catch (ArgumentException)
-                {
-                }
+                elStat.CustomNames.Add(name);
+                result = name;
             }
-            
-            elStat.ElementsCount--;
+
+            return result;
         }
 
-        private string BuildStandartName(IElement element, int number) => 
-            element.BaseName + " " + number.ToString();
-        private int GetElementNumber(IElement element)
+        public void RemoveElement(Type itemType, string name)
         {
-            ElementStat elementStat = _elements[element.GetType()];
-            elementStat.ElementsCount++;
+            if (itemType == null || !_elements.ContainsKey(itemType))
+                throw new ArgumentException();
 
+            ElementStat elStat = _elements[itemType];
+
+            if (elStat.CustomNames.Contains(name))
+            {
+                elStat.CustomNames.Remove(name);
+            }
+            else
+            {
+                int number = GetNumberFromName(name);
+                elStat.AddFreeNumber(number);
+                elStat.ElementsCount--;
+            }
+        }
+
+        private string BuildStandartName(ElementStat element, int number) => 
+            element.BaseName + " " + number.ToString();
+
+        private int GetNumberForItem(ElementStat elementStat)
+        {
             int number;
+            elementStat.ElementsCount++;
             if (elementStat.FreeNumbers.Count > 0)
             {
-                number = elementStat.FreeNumbers.Min();
-                elementStat.FreeNumbers.Remove(number);
+                number = elementStat.FreeNumbers[0];
+                elementStat.FreeNumbers.RemoveAt(0);
             }
             else
                 number = elementStat.ElementsCount;
@@ -129,19 +117,22 @@ namespace TreeRename.TreeElements
         }
         private int GetNumberFromName(string name)
         {
-            if (!name.Contains(' ')) throw new ArgumentException("Element name gave in incorrect format");
+            if (!name.Contains(' ')) 
+                throw new ArgumentException("Element name gave in incorrect format");
             return int.Parse(name.Split(' ').Last());
         }
-    }
-    internal class ElementStat
-    {
-        public int ElementsCount { get; set; }
-        public List<int> FreeNumbers { get; set; }
-        public List<string> CustomNames { get; set; }
-        public ElementStat()
+
+        private ElementStat GetStatOrCreate(Type type, string baseName)
         {
-            CustomNames = new List<string>();
-            FreeNumbers = new List<int>();
+            ElementStat result = new ElementStat();
+            if (!_elements.ContainsKey(type))
+            {
+                result.BaseName = baseName;
+                _elements.Add(type, result);
+            }
+            else
+                result = _elements[type];
+            return result;
         }
     }
 }

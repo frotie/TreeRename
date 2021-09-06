@@ -26,46 +26,89 @@ namespace TreeRename.TreeElements.BaseElements
         {
             if (child == null) return false;
 
-            InitChild(child, NameResolver.GetName(child));
-
-            return true;
+            try
+            {
+                string name = NameResolver.GetStandartName(child.GetType(), child.BaseName);
+                InitChild(child, name);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public bool RemoveChild(IElement child)
         {
             if(!Children.Contains(child)) return false;
 
-            NameResolver.RemoveElement(child);
-            Children.Remove(child);
-            return true;
+            try 
+            {
+                NameResolver.RemoveElement(child.GetType(), child.Name);
+                Children.Remove(child);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public bool Rename(string newName)
         {
-            if(string.IsNullOrEmpty(newName) || !NameResolver.Rename(this, newName)) 
+            if(string.IsNullOrEmpty(newName)) 
                 return false;
 
-            Name = newName;
-            return true;
+            try
+            {
+                string name = NameResolver.ChangeNameInStatistic(GetType(), newName, Name);
+                Name = name;
+
+                return true;
+            }
+            catch(ArgumentException)
+            {
+                // ex...
+            }
+            return false;
         }
 
-        public int AddChildren(List<IElement> children)
+        public int AddChildren(params IElement[] children)
         {
-            var names = NameResolver.GetNames(children.First(), children.Count);
-
-            for(int i = 0; i < names.Length; ++i)
+            try
             {
-                InitChild(children[i], names[i]);
-            }
+                IElement first = children.First();
+                string[] names = NameResolver.GetStandartNames(first.GetType(), first.BaseName, children.Length);
 
-            return names.Length;
+                for (int i = 0; i < names.Length; ++i)
+                {
+                    InitChild(children[i], names[i]);
+                }
+                return names.Length;
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         public void RemoveChildren(List<IElement> children)
         {
-            NameResolver.RemoveElements(children);
+            if (children == null)
+                throw new ArgumentNullException();
+
             foreach (var child in children)
-                Children.Remove(child);
+            {
+                try
+                {
+                    NameResolver.RemoveElement(child.GetType(), child.Name);
+                    Children.Remove(child);
+                }
+                catch
+                {
+                    continue;
+                }
+            }
         }
 
         private void InitChild(IElement child, string name)
