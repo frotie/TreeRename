@@ -14,11 +14,18 @@ namespace TreeRename
         static void Main(string[] args)
         {
             int elementsCount = (int)5e4;
+            Apartments aps = new Apartments();
+
+            CRUD(aps);
+            // SpeedTest(elementsCount);
+
+            Console.ReadKey();
+        }
+
+        private static void SpeedTest(int elementsCount)
+        {
             Apartments aps1 = new Apartments();
             Apartments aps2 = new Apartments();
-
-            // CRUD(aps1);
-
             AppendElements(aps1, aps2, elementsCount);
 
 
@@ -55,9 +62,6 @@ namespace TreeRename
 
             Console.WriteLine($"First tree elements: {aps1.Children.Count}");
             Console.WriteLine($"Second tree elements: {aps2.Children.Count}");
-
-
-            Console.ReadKey();
         }
 
         private static void CRUD(IElement element)
@@ -68,22 +72,27 @@ namespace TreeRename
 
             element.AddChildren(room1, room2, room3);
             PrintTree(element);
-            Console.WriteLine("\n\n");
+            Console.WriteLine("\n");
 
             element.RemoveChild(room2);
             PrintTree(element);
-            Console.WriteLine("\n\n");
+            Console.WriteLine("\n");
 
             room1.Rename("kitchen");
             PrintTree(element);
-            Console.WriteLine("\n\n");
+            Console.WriteLine("\n");
 
             element.AddChild(new Room());
             element.AddChild(new Room());
             element.AddChild(new Room());
 
+            
             PrintTree(element);
-            Console.WriteLine("\n\n");
+            Console.WriteLine("\n");
+
+            room1.Rename("Помещение");
+            PrintTree(element);
+            Console.WriteLine("\n");
         }
 
         private static void AppendElements(IElement aps1, IElement aps2, int elementsCount)

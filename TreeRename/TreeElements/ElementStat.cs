@@ -20,8 +20,15 @@ namespace TreeRename.TreeElements
 
         public void AddFreeNumber(int number)
         {
+            for(int i = 0; i < FreeNumbers.Count; ++i)
+            {
+                if(FreeNumbers[i] > number)
+                {
+                    FreeNumbers.Insert(i, number);
+                    return;
+                }
+            }
             FreeNumbers.Add(number);
-            FreeNumbers.Sort();
         }
     }
 }
