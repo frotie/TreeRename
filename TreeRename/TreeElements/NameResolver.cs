@@ -26,14 +26,5 @@ namespace TreeRename.TreeElements
 
             return stat;
         }
-
-        public void RemoveElement(Type itemType, string name)
-        {
-            if (itemType == null || !_elements.ContainsKey(itemType))
-                throw new ArgumentException();
-
-            ElementStat elStat = _elements[itemType];
-            elStat.RemoveItem(name);
-        }
     }
 }

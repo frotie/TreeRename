@@ -46,7 +46,9 @@ namespace TreeRename.TreeElements.BaseElements
 
             try 
             {
-                NameResolver.RemoveElement(child.GetType(), child.Name);
+                ElementStat stat = NameResolver.GetElementStatistic(child.GetType());
+                stat.RemoveItem(child.Name);
+
                 Children.Remove(child);
                 return true;
             }
@@ -105,7 +107,9 @@ namespace TreeRename.TreeElements.BaseElements
             {
                 try
                 {
-                    NameResolver.RemoveElement(child.GetType(), child.Name);
+                    ElementStat stat = NameResolver.GetElementStatistic(child.GetType());
+                    stat.RemoveItem(child.Name);
+
                     Children.Remove(child);
                 }
                 catch
