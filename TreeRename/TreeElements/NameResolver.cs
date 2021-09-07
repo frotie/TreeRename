@@ -13,37 +13,18 @@ namespace TreeRename.TreeElements
         {
             _elements = new Dictionary<Type, ElementStat>();
         }
-
-        public string GetStandartName(Type itemType, string baseName)
+        public ElementStat GetElementStatistic(Type itemType, string baseName = null)
         {
-            if (itemType == null || baseName == null) 
+            if (_elements.ContainsKey(itemType))
+                return _elements[itemType];
+
+            if (baseName == null)
                 throw new ArgumentNullException();
 
-            ElementStat elStat = GetStatOrCreate(itemType, baseName);
+            ElementStat stat = new ElementStat(baseName);
+            _elements.Add(itemType, stat);
 
-            return elStat.GetNextDefaultName();
-        }
-
-        public string[] GetStandartNames(Type itemType, string baseName, int itemCount)
-        {
-            if (itemType == null || itemCount == 0 || itemCount < 0) 
-                throw new ArgumentNullException();
-
-            ElementStat stat = GetStatOrCreate(itemType, baseName);
-            string[] result = stat.GetDefaultNamesList((uint)itemCount);
-
-            return result;
-        }
-
-        public string ChangeNameInStatistic(Type itemType, string oldName, string name)
-        {
-            if (itemType == null || !_elements.ContainsKey(itemType))
-                throw new ArgumentNullException();
-
-            ElementStat elStat = _elements[itemType];
-            string result = elStat.ChangeItemName(oldName, name);
-            
-            return result;
+            return stat;
         }
 
         public void RemoveElement(Type itemType, string name)
@@ -53,18 +34,6 @@ namespace TreeRename.TreeElements
 
             ElementStat elStat = _elements[itemType];
             elStat.RemoveItem(name);
-        }
-
-        private ElementStat GetStatOrCreate(Type type, string baseName)
-        {
-            ElementStat result = new ElementStat(baseName);
-            if (!_elements.ContainsKey(type))
-            {
-                _elements.Add(type, result);
-            }
-            else
-                result = _elements[type];
-            return result;
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TreeRename.TreeElements
 {
-    class ElementStat
+    public class ElementStat
     {
         private readonly string BaseName;
         private readonly List<uint> FreeNumbers;

@@ -18,8 +18,8 @@ namespace TreeRename.TreeElements.BaseElements
         public BaseElement()
         {
             Children = new List<IElement>();
-            Name = BaseName;
             NameResolver = new NameResolver();
+            Name = BaseName;
         }
 
         public bool AddChild(IElement child)
@@ -28,7 +28,9 @@ namespace TreeRename.TreeElements.BaseElements
 
             try
             {
-                string name = NameResolver.GetStandartName(child.GetType(), child.BaseName);
+                ElementStat stat = NameResolver.GetElementStatistic(child.GetType(), child.BaseName);
+                string name = stat.GetNextDefaultName();
+
                 InitChild(child, name);
                 return true;
             }
@@ -61,8 +63,8 @@ namespace TreeRename.TreeElements.BaseElements
 
             try
             {
-                string name = NameResolver.ChangeNameInStatistic(GetType(), Name, newName);
-                Name = name;
+                ElementStat stat = NameResolver.GetElementStatistic(GetType());
+                Name = stat.ChangeItemName(Name, newName);
 
                 return true;
             }
@@ -78,7 +80,9 @@ namespace TreeRename.TreeElements.BaseElements
             try
             {
                 IElement first = children.First();
-                string[] names = NameResolver.GetStandartNames(first.GetType(), first.BaseName, children.Length);
+                ElementStat stat = NameResolver.GetElementStatistic(first.GetType(), first.BaseName);
+
+                string[] names = stat.GetDefaultNamesList((uint)children.Length);
 
                 for (int i = 0; i < names.Length; ++i)
                 {
