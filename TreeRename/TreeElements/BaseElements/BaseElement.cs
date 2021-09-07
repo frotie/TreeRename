@@ -61,7 +61,7 @@ namespace TreeRename.TreeElements.BaseElements
 
             try
             {
-                string name = NameResolver.ChangeNameInStatistic(GetType(), newName, Name);
+                string name = NameResolver.ChangeNameInStatistic(GetType(), Name, newName);
                 Name = name;
 
                 return true;
