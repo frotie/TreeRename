@@ -8,12 +8,12 @@ namespace TreeRename.TreeElements
 {
     public class NameResolver
     {
-        private Dictionary<Type, ElementStat> _elements;
+        private Dictionary<Type, ElementCounter> _elements;
         public NameResolver()
         {
-            _elements = new Dictionary<Type, ElementStat>();
+            _elements = new Dictionary<Type, ElementCounter>();
         }
-        public ElementStat GetElementStatistic(Type itemType, string baseName = null)
+        public ElementCounter GetElementStatistic(Type itemType, string baseName = null)
         {
             if (_elements.ContainsKey(itemType))
                 return _elements[itemType];
@@ -21,7 +21,7 @@ namespace TreeRename.TreeElements
             if (baseName == null)
                 throw new ArgumentNullException();
 
-            ElementStat stat = new ElementStat(baseName);
+            ElementCounter stat = new ElementCounter(baseName);
             _elements.Add(itemType, stat);
 
             return stat;

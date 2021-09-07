@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace TreeRename.TreeElements
 {
-    public class ElementStat
+    public class ElementCounter
     {
         private readonly string BaseName;
         private readonly List<uint> FreeNumbers;
         private readonly List<string> CustomNames;
         private uint ElementsCount;
-        public ElementStat(string baseName)
+        public ElementCounter(string baseName)
         {
             BaseName = baseName;
             CustomNames = new List<string>();
