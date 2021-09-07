@@ -19,21 +19,23 @@ namespace TreeRename.TreeElements
             FreeNumbers = new List<int>();
         }
 
-        public string TakeNextDefaultName()
+        public string GetNextDefaultName()
         {
             int number;
-            StandartElementsCount++;
             if (FreeNumbers.Count > 0)
-            {
                 number = FreeNumbers[0];
-                FreeNumbers.RemoveAt(0);
-            }
             else
-                number = StandartElementsCount;
+                number = StandartElementsCount + 1;
 
             string name = BuildStandartName(number);
-
             return name;
+        }
+
+        public void TakeNextDefaultName()
+        {
+            StandartElementsCount++;
+            if (FreeNumbers.Count > 0)
+                FreeNumbers.RemoveAt(0);
         }
 
         public string[] TakeDefaultNamesList(int itemCount)
@@ -80,40 +82,34 @@ namespace TreeRename.TreeElements
             if (CustomNames.Contains(name))
                 throw new ArgumentException();
 
-            string result = "";
-
             int nameNumber = GetNumberFromName(name);
-            if (name.Contains(BaseName) && nameNumber != 0)
-            {
-                string baseItemName = GetNameFromStandartName(name);
-                if (baseItemName == BaseName)
-                {
-                    if(FreeNumbers.Contains(nameNumber))
-                    {
-                        FreeNumbers.Remove(nameNumber);
-                    }
-                    else if(StandartElementsCount < nameNumber)
-                    {
-                        int offset = StandartElementsCount + FreeNumbers.Count + 1;
-                        FreeNumbers.AddRange(Enumerable.Range(offset, nameNumber - offset));
-                    }
-                    else
-                    {
-                        return "";
-                    }
+            string baseItemName = GetNameFromStandartName(name);
 
-                    RemoveItem(oldName);
-                    result = name;
+            if (baseItemName == BaseName && nameNumber != 0)
+            {
+                if (FreeNumbers.Contains(nameNumber))
+                {
+                    FreeNumbers.Remove(nameNumber);
                 }
+                else if (StandartElementsCount < nameNumber)
+                {
+                    int offset = StandartElementsCount + FreeNumbers.Count + 1;
+                    FreeNumbers.AddRange(Enumerable.Range(offset, nameNumber - offset));
+                }
+                else
+                {
+                    return "";
+                }
+
+                StandartElementsCount++;
             }
             else
             {
-                RemoveItem(oldName);
                 CustomNames.Add(name);
-                result = name;
             }
 
-            return result;
+            RemoveItem(oldName);
+            return name;
         }
 
         private void AddFreeNumber(int number)

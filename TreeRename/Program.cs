@@ -16,6 +16,20 @@ namespace TreeRename
             int elementsCount = (int)5e4;
             Apartments aps = new Apartments();
 
+            //for(int i = 0; i < 10; ++i)
+            //{
+            //    var room = new Room();
+            //    aps.AddChild(room);
+
+            //    if (i % 2 == 0)
+            //        aps.RemoveChild(room);
+            //}
+
+            //Console.WriteLine(aps.Children.First().Rename("Помещение 6"));
+
+            //PrintTree(aps);
+
+
             CRUD(aps);
             // SpeedTest(elementsCount);
 
@@ -90,11 +104,11 @@ namespace TreeRename
             PrintTree(element);
             Console.WriteLine("\n");
 
-            room1.Rename("Помещение 10");
+            room1.Rename("Помещение 6");
             PrintTree(element);
             Console.WriteLine("\n");
 
-            for (int i = 0; i < 12; ++i)
+            for (int i = 0; i < 3; ++i)
             {
                 element.AddChild(new Room());
             }

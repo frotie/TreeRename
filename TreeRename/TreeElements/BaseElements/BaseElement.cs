@@ -29,7 +29,8 @@ namespace TreeRename.TreeElements.BaseElements
             try
             {
                 ElementCounter stat = NameResolver.GetElementCounter(child.GetType(), child.BaseName);
-                string name = stat.TakeNextDefaultName();
+                string name = stat.GetNextDefaultName();
+                stat.TakeNextDefaultName();
 
                 InitChild(child, name);
                 return true;
