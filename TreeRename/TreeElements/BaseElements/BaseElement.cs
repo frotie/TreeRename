@@ -28,8 +28,8 @@ namespace TreeRename.TreeElements.BaseElements
 
             try
             {
-                ElementCounter stat = NameResolver.GetElementStatistic(child.GetType(), child.BaseName);
-                string name = stat.GetNextDefaultName();
+                ElementCounter stat = NameResolver.GetElementCounter(child.GetType(), child.BaseName);
+                string name = stat.TakeNextDefaultName();
 
                 InitChild(child, name);
                 return true;
@@ -46,7 +46,7 @@ namespace TreeRename.TreeElements.BaseElements
 
             try 
             {
-                ElementCounter stat = NameResolver.GetElementStatistic(child.GetType());
+                ElementCounter stat = NameResolver.GetElementCounter(child.GetType());
                 stat.RemoveItem(child.Name);
 
                 Children.Remove(child);
@@ -65,9 +65,13 @@ namespace TreeRename.TreeElements.BaseElements
 
             try
             {
-                ElementCounter stat = NameResolver.GetElementStatistic(GetType());
-                Name = stat.ChangeItemName(Name, newName);
+                ElementCounter stat = NameResolver.GetElementCounter(GetType());
+                string name = stat.ChangeItemName(Name, newName);
 
+                if (name == "")
+                    return false;
+
+                Name = name;
                 return true;
             }
             catch(ArgumentException)
@@ -82,9 +86,9 @@ namespace TreeRename.TreeElements.BaseElements
             try
             {
                 IElement first = children.First();
-                ElementCounter stat = NameResolver.GetElementStatistic(first.GetType(), first.BaseName);
+                ElementCounter stat = NameResolver.GetElementCounter(first.GetType(), first.BaseName);
 
-                string[] names = stat.GetDefaultNamesList((uint)children.Length);
+                string[] names = stat.TakeDefaultNamesList(children.Length);
 
                 for (int i = 0; i < names.Length; ++i)
                 {
@@ -107,7 +111,7 @@ namespace TreeRename.TreeElements.BaseElements
             {
                 try
                 {
-                    ElementCounter stat = NameResolver.GetElementStatistic(child.GetType());
+                    ElementCounter stat = NameResolver.GetElementCounter(child.GetType());
                     stat.RemoveItem(child.Name);
 
                     Children.Remove(child);

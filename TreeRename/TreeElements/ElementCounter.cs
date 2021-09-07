@@ -9,66 +9,69 @@ namespace TreeRename.TreeElements
     public class ElementCounter
     {
         private readonly string BaseName;
-        private readonly List<uint> FreeNumbers;
+        private readonly List<int> FreeNumbers;
         private readonly List<string> CustomNames;
-        private uint ElementsCount;
+        private int StandartElementsCount;
         public ElementCounter(string baseName)
         {
             BaseName = baseName;
             CustomNames = new List<string>();
-            FreeNumbers = new List<uint>();
+            FreeNumbers = new List<int>();
         }
 
-        public string GetNextDefaultName()
+        public string TakeNextDefaultName()
         {
-            uint number;
-            ElementsCount++;
+            int number;
+            StandartElementsCount++;
             if (FreeNumbers.Count > 0)
             {
                 number = FreeNumbers[0];
                 FreeNumbers.RemoveAt(0);
             }
             else
-                number = ElementsCount;
+                number = StandartElementsCount;
 
             string name = BuildStandartName(number);
 
             return name;
         }
 
-        public string[] GetDefaultNamesList(uint itemCount)
+        public string[] TakeDefaultNamesList(int itemCount)
         {
             string[] result = new string[itemCount];
             int freeCount = FreeNumbers.Count;
 
-            for (uint i = 0; i < itemCount; ++i)
+            for (int i = 0; i < itemCount; ++i)
             {
-                uint number;
+                int number;
                 if (i < freeCount)
-                    number = FreeNumbers[(int)i];
+                    number = FreeNumbers[i];
                 else
-                    number = ElementsCount + i + 1;
+                    number = StandartElementsCount + i + 1;
 
                 result[i] = BuildStandartName(number);
             }
 
-            ElementsCount += itemCount;
-            FreeNumbers.RemoveRange(0, (int)Math.Min(itemCount, freeCount));
+            StandartElementsCount += itemCount;
+            FreeNumbers.RemoveRange(0, Math.Min(itemCount, freeCount));
 
             return result;
         }
 
         public void RemoveItem(string name)
         {
-            if (CustomNames.Contains(name))
+            int itemNumber = GetNumberFromName(name);
+            if(itemNumber == 0)
             {
-                CustomNames.Remove(name);
+                if (CustomNames.Contains(name))
+                {
+                    CustomNames.Remove(name);
+                }
             }
             else
             {
-                uint number = GetNumberFromName(name);
-                AddFreeNumber(number);
-                ElementsCount--;
+                AddFreeNumber(itemNumber);
+                StandartElementsCount--;
             }
         }
 
@@ -77,14 +80,35 @@ namespace TreeRename.TreeElements
             if (CustomNames.Contains(name))
                 throw new ArgumentException();
 
-            string result;
-            RemoveItem(oldName);
-            if (name == BaseName)
+            string result = "";
+
+            int nameNumber = GetNumberFromName(name);
+            if (name.Contains(BaseName) && nameNumber != 0)
             {
-                result = GetNextDefaultName();
+                string baseItemName = GetNameFromStandartName(name);
+                if (baseItemName == BaseName)
+                {
+                    if(FreeNumbers.Contains(nameNumber))
+                    {
+                        FreeNumbers.Remove(nameNumber);
+                    }
+                    else if(StandartElementsCount < nameNumber)
+                    {
+                        int offset = StandartElementsCount + FreeNumbers.Count + 1;
+                        FreeNumbers.AddRange(Enumerable.Range(offset, nameNumber - offset));
+                    }
+                    else
+                    {
+                        return "";
+                    }
+
+                    RemoveItem(oldName);
+                    result = name;
+                }
             }
             else
             {
+                RemoveItem(oldName);
                 CustomNames.Add(name);
                 result = name;
             }
@@ -92,7 +116,7 @@ namespace TreeRename.TreeElements
             return result;
         }
 
-        private void AddFreeNumber(uint number)
+        private void AddFreeNumber(int number)
         {
             for(int i = 0; i < FreeNumbers.Count; ++i)
             {
@@ -105,15 +129,32 @@ namespace TreeRename.TreeElements
             FreeNumbers.Add(number);
         }
 
-        private string BuildStandartName(uint number) =>
+        private string BuildStandartName(int number) =>
             BaseName + " " + number.ToString();
 
-        private static uint GetNumberFromName(string name)
+        private static int GetNumberFromName(string name)
+        {
+            int result = 0;
+            if (!name.Contains(' '))
+                return 0;
+
+            if (int.TryParse(name.Split(' ').Last(), out result))
+                return result;
+            else 
+                return 0;
+        }
+        private static string GetNameFromStandartName(string name)
         {
             if (!name.Contains(' '))
-                throw new ArgumentException("Element name gave in incorrect format");
+                return "";
 
-            return uint.Parse(name.Split(' ').Last());
+            int nameNumber = GetNumberFromName(name);
+            if(nameNumber != 0)
+            {
+                string result = name.Substring(0, name.Length - nameNumber.ToString().Length - 1);
+                return result;
+            }
+            return "";
         }
     }
 }

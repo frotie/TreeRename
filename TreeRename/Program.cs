@@ -90,7 +90,15 @@ namespace TreeRename
             PrintTree(element);
             Console.WriteLine("\n");
 
-            room1.Rename("Помещение");
+            room1.Rename("Помещение 10");
+            PrintTree(element);
+            Console.WriteLine("\n");
+
+            for (int i = 0; i < 12; ++i)
+            {
+                element.AddChild(new Room());
+            }
+
             PrintTree(element);
             Console.WriteLine("\n");
         }

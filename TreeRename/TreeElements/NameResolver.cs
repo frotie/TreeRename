@@ -13,7 +13,8 @@ namespace TreeRename.TreeElements
         {
             _elements = new Dictionary<Type, ElementCounter>();
         }
-        public ElementCounter GetElementStatistic(Type itemType, string baseName = null)
+
+        public ElementCounter GetElementCounter(Type itemType, string baseName = null)
         {
             if (_elements.ContainsKey(itemType))
                 return _elements[itemType];
