@@ -30,8 +30,8 @@ namespace TreeRename
             //PrintTree(aps);
 
 
-            CRUD(aps);
-            // SpeedTest(elementsCount);
+            // CRUD(aps);
+            SpeedTest(elementsCount);
 
             Console.ReadKey();
         }

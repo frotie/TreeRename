@@ -67,12 +67,12 @@ namespace TreeRename.TreeElements.BaseElements
             try
             {
                 ElementCounter stat = NameResolver.GetElementCounter(GetType());
-                string name = stat.ChangeItemName(Name, newName);
+                bool renameStatus = stat.ChangeItemName(Name, newName);
 
-                if (name == "")
+                if (!renameStatus)
                     return false;
 
-                Name = name;
+                Name = newName;
                 return true;
             }
             catch(ArgumentException)

@@ -77,7 +77,7 @@ namespace TreeRename.TreeElements
             }
         }
 
-        public string ChangeItemName(string oldName, string name)
+        public bool ChangeItemName(string oldName, string name)
         {
             if (CustomNames.Contains(name))
                 throw new ArgumentException();
@@ -98,7 +98,7 @@ namespace TreeRename.TreeElements
                 }
                 else
                 {
-                    return "";
+                    return false;
                 }
 
                 StandartElementsCount++;
@@ -109,7 +109,7 @@ namespace TreeRename.TreeElements
             }
 
             RemoveItem(oldName);
-            return name;
+            return true;
         }
 
         private void AddFreeNumber(int number)
