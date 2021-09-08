@@ -16,10 +16,13 @@ namespace TreeRename.TreeElements
 
         public ElementCounter GetElementCounter(Type itemType, string baseName = null)
         {
+            if (itemType == null)
+                throw new ArgumentNullException();
+
             if (_elements.ContainsKey(itemType))
                 return _elements[itemType];
 
-            if (baseName == null)
+            if (string.IsNullOrEmpty(baseName))
                 throw new ArgumentNullException();
 
             ElementCounter stat = new ElementCounter(baseName);

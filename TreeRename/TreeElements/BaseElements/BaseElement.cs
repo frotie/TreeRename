@@ -24,7 +24,8 @@ namespace TreeRename.TreeElements.BaseElements
 
         public bool AddChild(IElement child)
         {
-            if (child == null) return false;
+            if (child == null) 
+                return false;
 
             try
             {
@@ -43,12 +44,17 @@ namespace TreeRename.TreeElements.BaseElements
 
         public bool RemoveChild(IElement child)
         {
-            if(!Children.Contains(child)) return false;
+            if(child == null || !Children.Contains(child)) 
+                return false;
 
             try 
             {
                 ElementCounter stat = NameResolver.GetElementCounter(child.GetType());
-                stat.RemoveItem(child.Name);
+                bool removeStatus = stat.RemoveItem(child.Name);
+
+                // Some error: bad name
+                if (!removeStatus)
+                    return false;
 
                 Children.Remove(child);
                 return true;
@@ -78,18 +84,21 @@ namespace TreeRename.TreeElements.BaseElements
             catch(ArgumentException)
             {
                 // ex...
+                return false;
             }
-            return false;
         }
 
         public int AddChildren(params IElement[] children)
         {
+            if (children == null || children.Length == 0)
+                return 0;
+
             try
             {
                 IElement first = children.First();
                 ElementCounter stat = NameResolver.GetElementCounter(first.GetType(), first.BaseName);
 
-                string[] names = stat.TakeDefaultNamesList(children.Length);
+                string[] names = stat.TakeDefaultNamesList((uint)children.Length);
 
                 for (int i = 0; i < names.Length; ++i)
                 {
@@ -105,7 +114,7 @@ namespace TreeRename.TreeElements.BaseElements
 
         public void RemoveChildren(List<IElement> children)
         {
-            if (children == null)
+            if (children == null || children.Count == 0)
                 throw new ArgumentNullException();
 
             foreach (var child in children)
@@ -127,13 +136,10 @@ namespace TreeRename.TreeElements.BaseElements
         private void InitChild(IElement child, string name)
         {
             if (child is ISpecialElement)
-            {
                 child.NameResolver = new NameResolver();
-            }
             else
-            {
                 child.NameResolver = NameResolver;
-            }
+
             child.Name = name;
             child.BaseElement = this;
             Children.Add(child);

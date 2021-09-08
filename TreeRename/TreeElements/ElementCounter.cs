@@ -9,19 +9,22 @@ namespace TreeRename.TreeElements
     public class ElementCounter
     {
         private readonly string BaseName;
-        private readonly List<int> FreeNumbers;
+        private readonly List<uint> FreeNumbers;
         private readonly List<string> CustomNames;
-        private int StandartElementsCount;
+        private uint StandartElementsCount;
         public ElementCounter(string baseName)
         {
+            if (string.IsNullOrEmpty(baseName))
+                throw new ArgumentNullException();
+
             BaseName = baseName;
             CustomNames = new List<string>();
-            FreeNumbers = new List<int>();
+            FreeNumbers = new List<uint>();
         }
 
         public string GetNextDefaultName()
         {
-            int number;
+            uint number;
             if (FreeNumbers.Count > 0)
                 number = FreeNumbers[0];
             else
@@ -30,7 +33,6 @@ namespace TreeRename.TreeElements
             string name = BuildStandartName(number);
             return name;
         }
-
         public void TakeNextDefaultName()
         {
             StandartElementsCount++;
@@ -38,16 +40,19 @@ namespace TreeRename.TreeElements
                 FreeNumbers.RemoveAt(0);
         }
 
-        public string[] TakeDefaultNamesList(int itemCount)
+        public string[] TakeDefaultNamesList(uint itemCount)
         {
+            if(itemCount == 0)
+                throw new ArgumentOutOfRangeException();
+
             string[] result = new string[itemCount];
             int freeCount = FreeNumbers.Count;
 
-            for (int i = 0; i < itemCount; ++i)
+            for (uint i = 0; i < itemCount; ++i)
             {
-                int number;
+                uint number;
                 if (i < freeCount)
-                    number = FreeNumbers[i];
+                    number = FreeNumbers[(int)i];
                 else
                     number = StandartElementsCount + i + 1;
 
@@ -55,34 +60,49 @@ namespace TreeRename.TreeElements
             }
 
             StandartElementsCount += itemCount;
-            FreeNumbers.RemoveRange(0, Math.Min(itemCount, freeCount));
+            FreeNumbers.RemoveRange(0, (int)Math.Min(itemCount, freeCount));
 
             return result;
         }
 
-        public void RemoveItem(string name)
+        public bool RemoveItem(string name)
         {
-            int itemNumber = GetNumberFromName(name);
-            if(itemNumber == 0)
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException();
+
+            string baseParamName = GetNameFromStandartName(name);
+            uint itemNumber = GetNumberFromName(name);
+
+            if(baseParamName == BaseName && itemNumber != 0)
             {
-                if (CustomNames.Contains(name))
+                if(!FreeNumbers.Contains(itemNumber) && StandartElementsCount > 0)
                 {
-                    CustomNames.Remove(name);
+                    AddFreeNumber(itemNumber);
+                    StandartElementsCount--;
+
+                    return true;
                 }
             }
             else
             {
-                AddFreeNumber(itemNumber);
-                StandartElementsCount--;
+                if (CustomNames.Contains(name))
+                {
+                    CustomNames.Remove(name);
+                    return true;
+                }
             }
+            return false;
         }
 
         public bool ChangeItemName(string oldName, string name)
         {
+            if (string.IsNullOrEmpty(oldName) || string.IsNullOrEmpty(name))
+                throw new ArgumentNullException();
+
             if (CustomNames.Contains(name))
                 throw new ArgumentException();
 
-            int nameNumber = GetNumberFromName(name);
+            uint nameNumber = GetNumberFromName(name);
             string baseItemName = GetNameFromStandartName(name);
 
             if (baseItemName == BaseName && nameNumber != 0)
@@ -93,8 +113,9 @@ namespace TreeRename.TreeElements
                 }
                 else if (StandartElementsCount < nameNumber)
                 {
-                    int offset = StandartElementsCount + FreeNumbers.Count + 1;
-                    FreeNumbers.AddRange(Enumerable.Range(offset, nameNumber - offset));
+                    uint offset = (uint)(StandartElementsCount + FreeNumbers.Count + 1);
+                    for (uint i = offset; i < nameNumber; ++i)
+                        FreeNumbers.Add(i);
                 }
                 else
                 {
@@ -112,8 +133,11 @@ namespace TreeRename.TreeElements
             return true;
         }
 
-        private void AddFreeNumber(int number)
+        private void AddFreeNumber(uint number)
         {
+            if (number <= 0)
+                throw new ArgumentException();
+
             for(int i = 0; i < FreeNumbers.Count; ++i)
             {
                 if(FreeNumbers[i] > number)
@@ -125,26 +149,25 @@ namespace TreeRename.TreeElements
             FreeNumbers.Add(number);
         }
 
-        private string BuildStandartName(int number) =>
+        private string BuildStandartName(uint number) =>
             BaseName + " " + number.ToString();
 
-        private static int GetNumberFromName(string name)
+        private static uint GetNumberFromName(string name)
         {
-            int result = 0;
-            if (!name.Contains(' '))
+            if (string.IsNullOrEmpty(name) || !name.Contains(' '))
                 return 0;
 
-            if (int.TryParse(name.Split(' ').Last(), out result))
+            if (uint.TryParse(name.Split(' ').Last(), out uint result))
                 return result;
-            else 
-                return 0;
+
+            return 0;
         }
         private static string GetNameFromStandartName(string name)
         {
-            if (!name.Contains(' '))
+            if (string.IsNullOrEmpty(name) || !name.Contains(' '))
                 return "";
 
-            int nameNumber = GetNumberFromName(name);
+            uint nameNumber = GetNumberFromName(name);
             if(nameNumber != 0)
             {
                 string result = name.Substring(0, name.Length - nameNumber.ToString().Length - 1);
