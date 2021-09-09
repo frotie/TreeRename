@@ -31,7 +31,7 @@ namespace TreeRename.TreeElements.BaseElements
             {
                 ElementCounter stat = NameResolver.GetElementCounter(child.GetType(), child.BaseName);
                 string name = stat.GetNextDefaultName();
-                stat.TakeNextDefaultName();
+                stat.UseNextDefaultName();
 
                 InitChild(child, name);
                 return true;

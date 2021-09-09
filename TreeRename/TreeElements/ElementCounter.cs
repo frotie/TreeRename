@@ -21,7 +21,6 @@ namespace TreeRename.TreeElements
             CustomNames = new List<string>();
             FreeNumbers = new List<uint>();
         }
-
         public string GetNextDefaultName()
         {
             uint number;
@@ -33,7 +32,7 @@ namespace TreeRename.TreeElements
             string name = BuildStandartName(number);
             return name;
         }
-        public void TakeNextDefaultName()
+        public void UseNextDefaultName()
         {
             StandartElementsCount++;
             if (FreeNumbers.Count > 0)
@@ -42,9 +41,6 @@ namespace TreeRename.TreeElements
 
         public string[] TakeDefaultNamesList(uint itemCount)
         {
-            if(itemCount == 0)
-                throw new ArgumentOutOfRangeException();
-
             string[] result = new string[itemCount];
             int freeCount = FreeNumbers.Count;
 
@@ -70,28 +66,15 @@ namespace TreeRename.TreeElements
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException();
 
-            string baseParamName = GetNameFromStandartName(name);
-            uint itemNumber = GetNumberFromName(name);
-
-            if(baseParamName == BaseName && itemNumber != 0)
+            if(IsNameDefaultTemplate(name))
             {
-                if(!FreeNumbers.Contains(itemNumber) && StandartElementsCount > 0)
-                {
-                    AddFreeNumber(itemNumber);
-                    StandartElementsCount--;
-
-                    return true;
-                }
+                uint itemNumber = GetNumberFromName(name);
+                return TryRealizeNumber(itemNumber);
             }
             else
             {
-                if (CustomNames.Contains(name))
-                {
-                    CustomNames.Remove(name);
-                    return true;
-                }
+                return TryRealizeCustomName(name);
             }
-            return false;
         }
 
         public bool ChangeItemName(string oldName, string name)
@@ -99,45 +82,25 @@ namespace TreeRename.TreeElements
             if (string.IsNullOrEmpty(oldName) || string.IsNullOrEmpty(name))
                 throw new ArgumentNullException();
 
-            if (CustomNames.Contains(name))
-                throw new ArgumentException();
-
-            uint nameNumber = GetNumberFromName(name);
-            string baseItemName = GetNameFromStandartName(name);
-
-            if (baseItemName == BaseName && nameNumber != 0)
+            if (IsNameDefaultTemplate(name))
             {
-                if (FreeNumbers.Contains(nameNumber))
-                {
-                    FreeNumbers.Remove(nameNumber);
-                }
-                else if (StandartElementsCount < nameNumber)
-                {
-                    uint offset = (uint)(StandartElementsCount + FreeNumbers.Count + 1);
-                    for (uint i = offset; i < nameNumber; ++i)
-                        FreeNumbers.Add(i);
-                }
-                else
+                if (!TryAddCustomStandartName(name))
                 {
                     return false;
                 }
-
-                StandartElementsCount++;
             }
-            else
+            else if (!TryAddCustomName(name))
             {
-                CustomNames.Add(name);
+                return false;
             }
 
-            RemoveItem(oldName);
-            return true;
+            return RemoveItem(oldName);
         }
 
-        private void AddFreeNumber(uint number)
-        {
-            if (number <= 0)
-                throw new ArgumentException();
 
+
+        private void AddFreeNumberWithSort(uint number)
+        {
             for(int i = 0; i < FreeNumbers.Count; ++i)
             {
                 if(FreeNumbers[i] > number)
@@ -152,28 +115,85 @@ namespace TreeRename.TreeElements
         private string BuildStandartName(uint number) =>
             BaseName + " " + number.ToString();
 
-        private static uint GetNumberFromName(string name)
+        private bool IsNameDefaultTemplate(string name)
         {
             if (string.IsNullOrEmpty(name) || !name.Contains(' '))
-                return 0;
-
-            if (uint.TryParse(name.Split(' ').Last(), out uint result))
-                return result;
-
-            return 0;
-        }
-        private static string GetNameFromStandartName(string name)
-        {
-            if (string.IsNullOrEmpty(name) || !name.Contains(' '))
-                return "";
+                return false;
 
             uint nameNumber = GetNumberFromName(name);
             if(nameNumber != 0)
             {
                 string result = name.Substring(0, name.Length - nameNumber.ToString().Length - 1);
-                return result;
+                return result == BaseName;
             }
-            return "";
+            return false;
+        }
+
+        private static uint GetNumberFromName(string name)
+        {
+            if (uint.TryParse(name.Split(' ').Last(), out uint result))
+                return result;
+
+            return 0;
+        }
+
+        private bool TryRealizeNumber(uint number)
+        {
+            if (!FreeNumbers.Contains(number) && StandartElementsCount > 0)
+            {
+                AddFreeNumberWithSort(number);
+                StandartElementsCount--;
+
+                return true;
+            }
+            return false;
+        }
+        private bool TryRealizeCustomName(string name)
+        {
+            if (CustomNames.Contains(name))
+            {
+                CustomNames.Remove(name);
+                return true;
+            }
+            return false;
+        }
+        private bool TryAddCustomName(string name)
+        {
+            if (!CustomNames.Contains(name))
+            {
+                CustomNames.Add(name);
+                return true;
+            }
+            return false;
+        }
+
+         /// <summary>
+         /// Добавляет пользовательское стандартное имя
+         /// </summary>
+         /// <param name="name"></param>
+         /// <returns></returns>
+        private bool TryAddCustomStandartName(string name)
+        {
+            uint nameNumber = GetNumberFromName(name);
+            int index;
+
+            if ((index = FreeNumbers.IndexOf(nameNumber)) != -1)
+            {
+                FreeNumbers.RemoveAt(index);
+            }
+            else if (StandartElementsCount < nameNumber)
+            {
+                uint offset = (uint)(StandartElementsCount + FreeNumbers.Count + 1);
+                for (uint i = offset; i < nameNumber; ++i)
+                    FreeNumbers.Add(i);
+            }
+            else
+            {
+                return false;
+            }
+
+            StandartElementsCount++;
+            return true;
         }
     }
 }
